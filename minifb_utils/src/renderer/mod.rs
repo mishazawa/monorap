@@ -1,6 +1,7 @@
 use minifb::{Window, WindowOptions};
 pub mod setup;
 pub mod draw;
+pub mod color;
 
 #[derive(Debug)]
 pub struct Renderer {
@@ -24,5 +25,9 @@ impl Renderer {
       buffer: vec![0; vec_len],
       window: window,
     }
+  }
+
+  pub fn apply_layers (layers: Vec<Vec<u32>>) -> Vec<u32> {
+    layers[0].clone()
   }
 }
