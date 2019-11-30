@@ -42,9 +42,24 @@ impl Renderer {
       fill_color: Colored::TRANSPARENT as SimpleColor,
     }
   }
+}
 
+pub trait Processing {
+  fn setup(&mut self, f: impl Fn(&mut Self) -> ());
+  fn draw(&mut self, f: impl Fn(&mut Self) -> ());
+  fn stroke (&mut self, color: Color);
+  fn no_stroke (&mut self, flag: bool);
+  fn background (&mut self, color: Color);
+  fn dot (&mut self, x: i32, y: i32);
+  fn line (&mut self, x0: i32, y0: i32, x1: i32, y1: i32);
+}
 
-  pub fn draw (&mut self, draw_fn: impl Fn(&mut Renderer) -> ()) {
+impl Processing for Renderer {
+  fn setup (&mut self, f: impl Fn(&mut Renderer) -> ()) -> () {
+    f(self);
+  }
+
+  fn draw (&mut self, draw_fn: impl Fn(&mut Renderer) -> ()) {
     while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
       // make operations
       draw_fn(self);
@@ -53,30 +68,26 @@ impl Renderer {
     }
   }
 
-  pub fn setup (&mut self, f: impl Fn(&mut Renderer) -> ()) -> () {
-    f(self);
-  }
-
-  pub fn stroke (&mut self, color: Color) -> () {
+  fn stroke (&mut self, color: Color) -> () {
     self.stroke_color = color.hex;
   }
-  pub fn no_stroke (&mut self, flag: bool) -> () {
+  fn no_stroke (&mut self, flag: bool) -> () {
     self.stroke = !flag;
 
   }
 
-  pub fn background (&mut self, color: Color) -> () {
+  fn background (&mut self, color: Color) -> () {
     primitives::background(self, color);
   }
 
-  pub fn dot (&mut self, x: i32, y: i32) -> () {
+  fn dot (&mut self, x: i32, y: i32) -> () {
     if self.stroke {
       primitives::dot(self, x, y);
     }
   }
 
-  pub fn line (&self, x: i32, y: i32, x1: i32, y1: i32) -> () {
-    // primitives::line(&self, x, y, x1, y1);
+  fn line (&mut self, x0: i32, y0: i32, x1: i32, y1: i32) -> () {
+    primitives::line(self, x0, y0, x1, y1);
   }
-}
 
+}

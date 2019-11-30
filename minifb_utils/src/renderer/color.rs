@@ -1,11 +1,11 @@
 pub type SimpleColor = u32;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Copy, Clone)]
 pub struct Color {
-  r: u8,
-  g: u8,
-  b: u8,
-  a: u8,
+  pub r: u8,
+  pub g: u8,
+  pub b: u8,
+  pub a: u8,
   pub hex: SimpleColor,
 }
 
@@ -41,7 +41,6 @@ impl Color {
 
     return Color::new(r as u8, g as u8, b as u8, 255).hex;
   }
-
 }
 
 impl From<SimpleColor> for Color {

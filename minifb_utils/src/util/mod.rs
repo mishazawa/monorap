@@ -22,3 +22,8 @@ pub fn limit (val: i32, min: i32, max:i32) -> i32 {
     _ => val
   }
 }
+
+pub fn swap<T> (x: T, y: T) -> (T, T) {
+  (y, x)
+}
+
