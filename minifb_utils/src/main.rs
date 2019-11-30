@@ -19,9 +19,18 @@ fn main() {
   });
 
   processing.draw(|p| {
-    // p.background(Color::from(0xff10ff80));
+    p.background(Color::from(0xff10ff80));
     for i in 100..200 {
-      p.dot(i, i, Color::from(0xffffffff));
+      p.stroke(Color::from([i, i, i, i]));
+
+      if i%2 == 0 {
+        p.no_stroke(true);
+      } else {
+        p.no_stroke(false);
+      }
+      p.dot(i as i32 , i as i32);
     }
+    p.dot(-1000, -121313);
+
   });
 }

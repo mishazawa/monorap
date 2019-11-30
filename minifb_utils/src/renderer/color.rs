@@ -58,6 +58,17 @@ impl From<SimpleColor> for Color {
   }
 }
 
+impl From<[u8;4]> for Color {
+  fn from (color: [u8;4]) -> Self {
+    Self::new(
+      color[0],
+      color[1],
+      color[2],
+      color[3],
+    )
+  }
+}
+
 impl PartialEq for Color {
   fn eq(&self, other: &Self) -> bool {
     self.hex == other.hex
