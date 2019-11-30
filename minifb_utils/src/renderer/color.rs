@@ -16,6 +16,7 @@ pub enum Colored {
   BLUE = 0xff0000ff,
   WHITE = 0xffffffff,
   BLACK = 0xff000000,
+  TRANSPARENT = 0x00000000
 }
 
 
@@ -57,24 +58,8 @@ impl From<SimpleColor> for Color {
   }
 }
 
-
 impl PartialEq for Color {
   fn eq(&self, other: &Self) -> bool {
     self.hex == other.hex
   }
-}
-
-#[cfg(test)]
-
-mod unit {
-  use super::*;
-
-  #[test]
-  fn cast_from_simple () {
-    let red = Color::new(255, 0, 0, 255);
-    let random = Color::new(14, 88, 22, 128);
-    assert_eq!(Color::from(RED), red);
-    assert_eq!(Color::from(0x800E5816), random);
-  }
-
 }
