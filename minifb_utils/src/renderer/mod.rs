@@ -1,4 +1,7 @@
 use minifb::{Window, WindowOptions};
+use color::{SimpleColor, Color};
+use crate::{WIDTH, HEIGHT};
+
 pub mod setup;
 pub mod draw;
 pub mod color;
@@ -10,12 +13,12 @@ pub struct Renderer {
 }
 
 impl Renderer {
-  pub fn new (w: usize, h: usize) -> Self {
-    let vec_len = (w * h) as usize;
+  pub fn new () -> Self {
+    let vec_len = WIDTH * HEIGHT;
     let window = Window::new(
       "Test - ESC to exit",
-      w,
-      h,
+      WIDTH,
+      HEIGHT,
       WindowOptions::default()
     ).unwrap_or_else(|e| {
       panic!("{}", e);
@@ -27,7 +30,13 @@ impl Renderer {
     }
   }
 
-  pub fn apply_layers (layers: Vec<Vec<u32>>) -> Vec<u32> {
-    layers[0].clone()
+  pub fn apply_layers (layers: Vec<Vec<SimpleColor>>) -> Vec<SimpleColor> {
+    let mask = vec![0x00; WIDTH * HEIGHT];
+    return layers.iter().fold(mask, |mut acc, layer| {
+      for (i, color) in acc.iter_mut().enumerate() {
+        *color = Color::blend_color(Color::from(*color), Color::from(layer[i]));
+      }
+      acc
+    });
   }
 }
