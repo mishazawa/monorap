@@ -14,5 +14,5 @@ pub fn is_outside(val: i32, min: usize, max: usize) -> bool {
 }
 
 pub fn deg_to_rad(val: f32) -> f32 {
-  val * PI / 180.
+    val * PI / 180.
 }

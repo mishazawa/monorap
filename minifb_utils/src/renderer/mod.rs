@@ -1,6 +1,5 @@
-use std::process;
 use minifb::{Key, Window, WindowOptions};
-
+use std::process;
 
 use crate::color::{Color, Colored, SimpleColor};
 use crate::primitives;
@@ -74,13 +73,13 @@ impl Renderer {
     }
 
     pub fn apply_translation(&self, x: i32, y: i32) -> (i32, i32) {
-      self.transform_matrix.translate((x, y))
+        self.transform_matrix.translate((x, y))
     }
     pub fn apply_rotation(&self, x: i32, y: i32) -> (i32, i32) {
-      self.transform_matrix.rotate((x, y))
+        self.transform_matrix.rotate((x, y))
     }
     pub fn apply_scaling(&self, x: i32, y: i32) -> (i32, i32) {
-      self.transform_matrix.scale((x, y))
+        self.transform_matrix.scale((x, y))
     }
 }
 
@@ -115,9 +114,12 @@ impl Processing for Renderer {
             // make operations
             draw_fn(self);
             if self.transform_stack.len() != 0 {
-              eprintln!("Transform stack is not empty! len: {:?}", self.transform_stack.len());
-              eprintln!("Check draw() function for unmatched push_matrix calls");
-              return;
+                eprintln!(
+                    "Transform stack is not empty! len: {:?}",
+                    self.transform_stack.len()
+                );
+                eprintln!("Check draw() function for unmatched push_matrix calls");
+                return;
             }
             // draw pixels
             self.window.update_with_buffer(&self.buffer).unwrap();
@@ -179,51 +181,54 @@ impl Processing for Renderer {
 
     fn pop_matrix(&mut self) -> () {
         match self.transform_stack.pop() {
-          Some (_) => {
-            self.fold_transform();
-          },
-          None => {
-            eprintln!("Trying to call pop_matrix() on empty stack!");
-            eprintln!("Check draw() function for unmatched pop_matrix calls.");
-            process::exit(1);
-          }
+            Some(_) => {
+                self.fold_transform();
+            }
+            None => {
+                eprintln!("Trying to call pop_matrix() on empty stack!");
+                eprintln!("Check draw() function for unmatched pop_matrix calls.");
+                process::exit(1);
+            }
         }
     }
 
     fn translate(&mut self, x: i32, y: i32) -> () {
-      match self.transform_stack.last_mut() {
-        Some(matrix) => {
-          matrix.translation = (matrix.translation.0 + x, matrix.translation.1 + y);
-        },
-        None => {
-          self.transform_matrix.translation = (self.transform_matrix.translation.0 + x, self.transform_matrix.translation.1 + y);
+        match self.transform_stack.last_mut() {
+            Some(matrix) => {
+                matrix.translation = (matrix.translation.0 + x, matrix.translation.1 + y);
+            }
+            None => {
+                self.transform_matrix.translation = (
+                    self.transform_matrix.translation.0 + x,
+                    self.transform_matrix.translation.1 + y,
+                );
+            }
         }
-      }
-      self.fold_transform();
+        self.fold_transform();
     }
 
     fn scale(&mut self, ratio: f32) -> () {
-      match self.transform_stack.last_mut() {
-        Some(matrix) => {
-          matrix.scale = ratio;
-        },
-        None => {
-          self.transform_matrix.scale = ratio;
+        match self.transform_stack.last_mut() {
+            Some(matrix) => {
+                matrix.scale = ratio;
+            }
+            None => {
+                self.transform_matrix.scale = ratio;
+            }
         }
-      }
-      self.fold_transform();
+        self.fold_transform();
     }
 
     fn rotate(&mut self, deg: f32) -> () {
-      let radians = util::deg_to_rad(deg);
-      match self.transform_stack.last_mut() {
-        Some(matrix) => {
-          matrix.rotation = radians;
-        },
-        None => {
-          self.transform_matrix.rotation = radians;
+        let radians = util::deg_to_rad(deg);
+        match self.transform_stack.last_mut() {
+            Some(matrix) => {
+                matrix.rotation = radians;
+            }
+            None => {
+                self.transform_matrix.rotation = radians;
+            }
         }
-      }
-      self.fold_transform();
+        self.fold_transform();
     }
 }

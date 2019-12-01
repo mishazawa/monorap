@@ -6,7 +6,7 @@ mod renderer;
 mod util;
 
 use crate::color::Color;
-use crate::renderer::{ Processing, Renderer };
+use crate::renderer::{Processing, Renderer};
 
 pub const WIDTH: usize = 640;
 pub const HEIGHT: usize = 360;

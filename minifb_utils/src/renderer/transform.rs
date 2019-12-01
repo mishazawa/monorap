@@ -22,8 +22,6 @@ impl TransformMatrix {
         }
     }
 
-
-
     pub fn add(&mut self, matrix: &Self) -> &mut Self {
         self.rotation = matrix.rotation;
         self.rotation_sin_cos = (self.rotation.sin(), self.rotation.cos());
@@ -50,10 +48,13 @@ impl Transformation for TransformMatrix {
         (self.translation.0 + xy.0, self.translation.1 + xy.1)
     }
 
-    fn scale(&self, xy:(i32, i32)) -> (i32, i32) {
+    fn scale(&self, xy: (i32, i32)) -> (i32, i32) {
         return match self.scale {
             s if s == 0.0 => xy,
-            _ => ((self.scale * xy.0 as f32) as i32, (self.scale * xy.1 as f32) as i32)
-        }
+            _ => (
+                (self.scale * xy.0 as f32) as i32,
+                (self.scale * xy.1 as f32) as i32,
+            ),
+        };
     }
 }

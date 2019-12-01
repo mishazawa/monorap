@@ -38,7 +38,6 @@ pub fn line(renderer: &mut Renderer, mut x0: i32, mut y0: i32, mut x1: i32, mut 
         y1 = temp;
     }
 
-
     let from = (x0, y0);
     let to = (x1, y1);
 
@@ -115,7 +114,6 @@ fn quad(
 pub fn draw_shape(renderer: &mut Renderer) -> () {
     let shape = renderer.shape_to_draw.clone();
     for (i, _) in shape.iter().enumerate().step_by(2) {
-
         let begin_x = shape.get(i);
         let begin_y = shape.get(i + 1);
         let end_x = shape.get(i + 2);
