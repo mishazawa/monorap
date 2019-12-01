@@ -4,7 +4,7 @@ mod primitives;
 mod renderer;
 mod util;
 
-use crate::renderer::{ Renderer, Processing };
+use crate::renderer::{ Renderer, Processing, ShapeMode };
 use crate::renderer::color::{ Color };
 
 pub const WIDTH: usize = 640;
@@ -17,6 +17,8 @@ fn main() {
   processing.setup(|_p| {
 
   });
+
+  let mut frame = 0;
 
   processing.draw(|p| {
     p.background(Color::from(0xffffffff));
@@ -42,5 +44,42 @@ fn main() {
 
     p.stroke(Color::from([255, 0, 255, 255]));
     p.line(320, 0 , 320, 360);
+
+    p.stroke(Color::from([0, 0, 0, 255]));
+    p.rect(10, 10, 20, 20);
+
+    p.rect(150, 10, 220, 120);
+
+
+    p.begin_shape(ShapeMode::LINES);
+    p.vertex(30, 20);
+    p.vertex(85, 20);
+    p.vertex(85, 75);
+    p.vertex(30, 75);
+    p.end_shape();
+
+    p.begin_shape(ShapeMode::POINTS);
+    p.vertex(10, 20);
+    p.vertex(80, 5);
+    p.vertex(95, 90);
+    p.vertex(40, 95);
+    p.end_shape();
+
+    p.begin_shape(ShapeMode::LINES);
+    let radius = 100.;
+    let mut angle: f32 = 0.;
+    for _ in 0..30 {
+      let x = (radius * angle.cos()) as i32;
+      let y = (radius * angle.sin()) as i32;
+      p.vertex(x + frame, y + frame / 2);
+      angle += 0.1;
+    }
+
+
+    p.end_shape();
+
+    frame  += 1;
+
+    p.dot((WIDTH) as i32, (HEIGHT) as i32);
   });
 }

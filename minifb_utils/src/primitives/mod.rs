@@ -1,4 +1,4 @@
-use crate::renderer::{ Renderer, Processing };
+use crate::renderer::{ Renderer, Processing, ShapeMode};
 use crate::renderer::color::Color;
 use crate::util;
 
@@ -69,13 +69,15 @@ pub fn line (renderer: &mut Renderer, mut x0: i32, mut y0: i32, mut x1: i32, mut
     ]));
     dot(renderer, dot_x, dot_y);
 
-    renderer.stroke(Color::from([
-      color.r,
-      color.g,
-      color.b,
-      (color.a as f32 * intersect_y.fract()) as u8
-    ]));
-    dot(renderer, dot_x - 1, dot_y);
+    // TODO: fix proper brightness
+
+    // renderer.stroke(Color::from([
+    //   color.r,
+    //   color.g,
+    //   color.b,
+    //   (color.a as f32 * intersect_y.fract()) as u8
+    // ]));
+    // dot(renderer, dot_x - 1, dot_y);
 
     intersect_y += gradient;
   }
@@ -93,8 +95,60 @@ pub fn ellipse (renderer: &mut Renderer, x: i32, y: i32, w: i32, h: i32) {
   unimplemented!();
 }
 
+pub fn rect (renderer: &mut Renderer, x: i32, y: i32, w: i32, h: i32) {
+  quad(renderer, x, y, x+w, y, x+w, y+h, x, y+h);
+}
+
+fn quad (renderer: &mut Renderer,
+         x1: i32, y1: i32, x2: i32, y2: i32,
+         x3: i32, y3: i32, x4: i32, y4: i32) -> () {
+  renderer.begin_shape(renderer.shape_type.clone());
+  renderer.vertex(x1, y1);
+  renderer.vertex(x2, y2);
+  renderer.vertex(x3, y3);
+  renderer.vertex(x4, y4);
+  renderer.end_shape();
+}
 
 #[allow(unused_variables, dead_code)]
-pub fn rect (renderer: &mut Renderer, x: i32, y: i32, w: i32, h: i32) {
+fn fill (renderer: &mut Renderer) -> () {
   unimplemented!();
+}
+
+
+pub fn draw_shape (renderer: &mut Renderer) -> () {
+  let shape = renderer.shape_to_draw.clone();
+  for (i, _)in shape.iter().enumerate().step_by(2) {
+    let begin_x = shape.get(i);
+    let begin_y = shape.get(i + 1);
+    let end_x = shape.get(i + 2);
+    let end_y = shape.get(i + 3);
+
+    match (begin_x, begin_y, end_x, end_y) {
+      (Some(a), Some(b), Some(c), Some(d))  => {
+        match renderer.shape_type {
+          ShapeMode::POINTS => {
+            dot(renderer, *a, *b);
+          },
+          ShapeMode::LINES => {
+            line(renderer, *a, *b, *c, *d);
+          },
+        }
+      },
+      (Some(a), Some(b), None, None) => {
+        match renderer.shape_type {
+          ShapeMode::POINTS => {
+            dot(renderer, *a, *b);
+          },
+          ShapeMode::LINES => {
+            line(renderer, *a, *b, shape[0], shape[1]);
+          },
+        }
+      },
+      _ => {
+        println!("Wrong shape: {:?}", shape);
+      }
+    }
+  }
+  renderer.shape_to_draw.clear();
 }
