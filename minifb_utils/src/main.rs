@@ -6,7 +6,7 @@ mod renderer;
 mod util;
 
 use crate::color::Color;
-use crate::renderer::{Processing, Renderer, ShapeMode};
+use crate::renderer::{ Processing, Renderer };
 
 pub const WIDTH: usize = 640;
 pub const HEIGHT: usize = 360;
@@ -79,14 +79,14 @@ fn main() {
         // p.dot((WIDTH) as i32, (HEIGHT) as i32);
 
         p.push_matrix();
-        for i in 0..5 {
-          p.translate(10, 10);
-          p.rect(0, 0, 20, 20);
-          p.push_matrix();
-          p.translate(100 + frame, i);
-          p.rect(0, 0, 20, 20 * i);
-          p.pop_matrix();
-        }
+
+        p.translate(10, 10);
+        p.rect(0, 0, 20, 20);
+
+        p.translate(20, 0);
+        p.rotate(45.);
+        p.rect(0, 0, 20, 20);
+
         p.pop_matrix();
 
         frame += 1;

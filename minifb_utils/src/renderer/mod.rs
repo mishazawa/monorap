@@ -1,9 +1,11 @@
 use std::process;
-use crate::color::{Color, Colored, SimpleColor};
 use minifb::{Key, Window, WindowOptions};
 
+
+use crate::color::{Color, Colored, SimpleColor};
 use crate::primitives;
 use crate::renderer::transform::*;
+use crate::util;
 mod transform;
 
 #[derive(Debug, Clone, Copy)]
@@ -71,8 +73,14 @@ impl Renderer {
         self.transform_matrix = acc;
     }
 
-    pub fn apply_transform(&self, x: i32, y: i32) -> (i32, i32) {
-        self.transform_matrix.apply(x, y)
+    pub fn apply_translation(&self, x: i32, y: i32) -> (i32, i32) {
+      self.transform_matrix.translate((x, y))
+    }
+    pub fn apply_rotation(&self, x: i32, y: i32) -> (i32, i32) {
+      self.transform_matrix.rotate((x, y))
+    }
+    pub fn apply_scaling(&self, x: i32, y: i32) -> (i32, i32) {
+      self.transform_matrix.scale((x, y))
     }
 }
 
@@ -93,6 +101,8 @@ pub trait Processing {
     fn push_matrix(&mut self);
     fn pop_matrix(&mut self);
     fn translate(&mut self, x: i32, y: i32);
+    fn rotate(&mut self, deg: f32);
+    fn scale(&mut self, ratio: f32);
 }
 
 impl Processing for Renderer {
@@ -180,7 +190,7 @@ impl Processing for Renderer {
         }
     }
 
-    fn translate(&mut self, x: i32, y: i32) {
+    fn translate(&mut self, x: i32, y: i32) -> () {
       match self.transform_stack.last_mut() {
         Some(matrix) => {
           matrix.translation = (matrix.translation.0 + x, matrix.translation.1 + y);
@@ -192,4 +202,28 @@ impl Processing for Renderer {
       self.fold_transform();
     }
 
+    fn scale(&mut self, ratio: f32) -> () {
+      match self.transform_stack.last_mut() {
+        Some(matrix) => {
+          matrix.scale = ratio;
+        },
+        None => {
+          self.transform_matrix.scale = ratio;
+        }
+      }
+      self.fold_transform();
+    }
+
+    fn rotate(&mut self, deg: f32) -> () {
+      let radians = util::deg_to_rad(deg);
+      match self.transform_stack.last_mut() {
+        Some(matrix) => {
+          matrix.rotation = radians;
+        },
+        None => {
+          self.transform_matrix.rotation = radians;
+        }
+      }
+      self.fold_transform();
+    }
 }

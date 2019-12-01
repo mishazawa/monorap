@@ -3,7 +3,8 @@ use crate::renderer::{Processing, Renderer, ShapeMode};
 use crate::util;
 
 pub fn dot(renderer: &mut Renderer, x0: i32, y0: i32) -> () {
-    let (x, y) = renderer.apply_transform(x0, y0);
+    let (x, y) = renderer.apply_translation(x0, y0);
+
     match util::coords_to_index(x, y, renderer.width, renderer.height) {
         Some(index) => {
             renderer.buffer[index] = renderer.stroke_color;
@@ -14,8 +15,6 @@ pub fn dot(renderer: &mut Renderer, x0: i32, y0: i32) -> () {
 
 pub fn line(renderer: &mut Renderer, mut x0: i32, mut y0: i32, mut x1: i32, mut y1: i32) {
     let color = Color::from(renderer.stroke_color);
-
-    let (x, y) = renderer.apply_transform(x0, y0);
 
     let steep = (y1 - y0).abs() > (x1 - x0).abs();
 
@@ -38,6 +37,7 @@ pub fn line(renderer: &mut Renderer, mut x0: i32, mut y0: i32, mut x1: i32, mut 
         y0 = y1;
         y1 = temp;
     }
+
 
     let from = (x0, y0);
     let to = (x1, y1);
@@ -115,6 +115,7 @@ fn quad(
 pub fn draw_shape(renderer: &mut Renderer) -> () {
     let shape = renderer.shape_to_draw.clone();
     for (i, _) in shape.iter().enumerate().step_by(2) {
+
         let begin_x = shape.get(i);
         let begin_y = shape.get(i + 1);
         let end_x = shape.get(i + 2);
