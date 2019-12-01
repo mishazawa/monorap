@@ -11,10 +11,10 @@ pub struct Color {
 
 #[derive(Debug)]
 pub enum Colored {
-    RED = 0xffff0000,
-    GREEN = 0xff00ff00,
-    BLUE = 0xff0000ff,
-    WHITE = 0xffffffff,
+    // RED = 0xffff0000,
+    // GREEN = 0xff00ff00,
+    // BLUE = 0xff0000ff,
+    // WHITE = 0xffffffff,
     BLACK = 0xff000000,
     TRANSPARENT = 0x00000000,
 }
@@ -31,16 +31,16 @@ impl Color {
         }
     }
 
-    pub fn blend_color(background: Color, foreground: Color) -> SimpleColor {
-        let alpha = 255u8.checked_sub(foreground.a).unwrap_or(0x00) as f32 / 100.;
-        let falpha = foreground.a as f32 / 100.;
+    // pub fn blend_color(background: Color, foreground: Color) -> SimpleColor {
+    //     let alpha = 255u8.checked_sub(foreground.a).unwrap_or(0x00) as f32 / 100.;
+    //     let falpha = foreground.a as f32 / 100.;
 
-        let r = background.r as f32 * alpha + foreground.r as f32 * falpha;
-        let g = background.g as f32 * alpha + foreground.g as f32 * falpha;
-        let b = background.b as f32 * alpha + foreground.b as f32 * falpha;
+    //     let r = background.r as f32 * alpha + foreground.r as f32 * falpha;
+    //     let g = background.g as f32 * alpha + foreground.g as f32 * falpha;
+    //     let b = background.b as f32 * alpha + foreground.b as f32 * falpha;
 
-        return Color::new(r as u8, g as u8, b as u8, 255).hex;
-    }
+    //     return Color::new(r as u8, g as u8, b as u8, 255).hex;
+    // }
 }
 
 impl From<SimpleColor> for Color {

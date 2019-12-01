@@ -1,9 +1,10 @@
-use color::{Color, Colored, SimpleColor};
+use std::process;
+use crate::color::{Color, Colored, SimpleColor};
 use minifb::{Key, Window, WindowOptions};
 
 use crate::primitives;
-
-pub mod color;
+use crate::renderer::transform::*;
+mod transform;
 
 #[derive(Debug, Clone, Copy)]
 pub enum ShapeMode {
@@ -25,6 +26,9 @@ pub struct Renderer {
 
     pub shape_type: ShapeMode,
     pub shape_to_draw: Vec<i32>,
+
+    pub transform_matrix: TransformMatrix,
+    transform_stack: Vec<TransformMatrix>,
 }
 
 impl Renderer {
@@ -53,7 +57,22 @@ impl Renderer {
 
             shape_type: ShapeMode::LINES,
             shape_to_draw: vec![],
+
+            transform_matrix: TransformMatrix::new(),
+            transform_stack: vec![],
         }
+    }
+
+    fn fold_transform(&mut self) -> () {
+        let mut acc = TransformMatrix::new();
+        for mat in self.transform_stack.iter() {
+            acc.add(mat);
+        }
+        self.transform_matrix = acc;
+    }
+
+    pub fn apply_transform(&self, x: i32, y: i32) -> (i32, i32) {
+        self.transform_matrix.apply(x, y)
     }
 }
 
@@ -71,6 +90,9 @@ pub trait Processing {
     fn begin_shape(&mut self, shape_type: ShapeMode);
     fn vertex(&mut self, x: i32, y: i32);
     fn end_shape(&mut self);
+    fn push_matrix(&mut self);
+    fn pop_matrix(&mut self);
+    fn translate(&mut self, x: i32, y: i32);
 }
 
 impl Processing for Renderer {
@@ -82,6 +104,11 @@ impl Processing for Renderer {
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
             // make operations
             draw_fn(self);
+            if self.transform_stack.len() != 0 {
+              eprintln!("Transform stack is not empty! len: {:?}", self.transform_stack.len());
+              eprintln!("Check draw() function for unmatched push_matrix calls");
+              return;
+            }
             // draw pixels
             self.window.update_with_buffer(&self.buffer).unwrap();
         }
@@ -135,4 +162,34 @@ impl Processing for Renderer {
     fn end_shape(&mut self) -> () {
         primitives::draw_shape(self);
     }
+    fn push_matrix(&mut self) -> () {
+        self.transform_stack.push(TransformMatrix::new());
+        self.fold_transform();
+    }
+
+    fn pop_matrix(&mut self) -> () {
+        match self.transform_stack.pop() {
+          Some (_) => {
+            self.fold_transform();
+          },
+          None => {
+            eprintln!("Trying to call pop_matrix() on empty stack!");
+            eprintln!("Check draw() function for unmatched pop_matrix calls.");
+            process::exit(1);
+          }
+        }
+    }
+
+    fn translate(&mut self, x: i32, y: i32) {
+      match self.transform_stack.last_mut() {
+        Some(matrix) => {
+          matrix.translation = (matrix.translation.0 + x, matrix.translation.1 + y);
+        },
+        None => {
+          self.transform_matrix.translation = (self.transform_matrix.translation.0 + x, self.transform_matrix.translation.1 + y);
+        }
+      }
+      self.fold_transform();
+    }
+
 }

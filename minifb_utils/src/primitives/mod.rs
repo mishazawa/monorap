@@ -1,8 +1,9 @@
-use crate::renderer::color::Color;
+use crate::color::Color;
 use crate::renderer::{Processing, Renderer, ShapeMode};
 use crate::util;
 
-pub fn dot(renderer: &mut Renderer, x: i32, y: i32) -> () {
+pub fn dot(renderer: &mut Renderer, x0: i32, y0: i32) -> () {
+    let (x, y) = renderer.apply_transform(x0, y0);
     match util::coords_to_index(x, y, renderer.width, renderer.height) {
         Some(index) => {
             renderer.buffer[index] = renderer.stroke_color;
@@ -13,6 +14,9 @@ pub fn dot(renderer: &mut Renderer, x: i32, y: i32) -> () {
 
 pub fn line(renderer: &mut Renderer, mut x0: i32, mut y0: i32, mut x1: i32, mut y1: i32) {
     let color = Color::from(renderer.stroke_color);
+
+    let (x, y) = renderer.apply_transform(x0, y0);
+
     let steep = (y1 - y0).abs() > (x1 - x0).abs();
 
     let mut temp;
@@ -85,11 +89,6 @@ pub fn background(renderer: &mut Renderer, color: Color) -> () {
     }
 }
 
-#[allow(unused_variables, dead_code)]
-pub fn ellipse(renderer: &mut Renderer, x: i32, y: i32, w: i32, h: i32) {
-    unimplemented!();
-}
-
 pub fn rect(renderer: &mut Renderer, x: i32, y: i32, w: i32, h: i32) {
     quad(renderer, x, y, x + w, y, x + w, y + h, x, y + h);
 }
@@ -111,11 +110,6 @@ fn quad(
     renderer.vertex(x3, y3);
     renderer.vertex(x4, y4);
     renderer.end_shape();
-}
-
-#[allow(unused_variables, dead_code)]
-fn fill(renderer: &mut Renderer) -> () {
-    unimplemented!();
 }
 
 pub fn draw_shape(renderer: &mut Renderer) -> () {
