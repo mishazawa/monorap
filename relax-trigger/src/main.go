@@ -5,7 +5,7 @@ import (
 	"flag"
 	"time"
 	"github.com/gen2brain/beeep"
-  )
+	)
 
 
 func main() {
@@ -35,6 +35,6 @@ func Relax(t int) {
 func message (mess string, t int, img string) {
 	err := beeep.Notify("Relax trigger", fmt.Sprintf("%s for %d minutes", mess, t), img)
 	if err != nil {
-    panic(err)
+		panic(err)
 	}
 }
