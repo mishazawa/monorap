@@ -16,9 +16,15 @@ func main() {
 
 	for {
 		Work(*work_time);
-		time.Sleep(time.Duration(*work_time) * time.Minute)
+		for i := 0; i < *work_time; i++ {
+			fmt.Printf("continue work %v minutes.\n", *work_time - i)
+			time.Sleep(time.Minute)
+		}
 		Relax(*relax_time);
-		time.Sleep(time.Duration(*relax_time) * time.Minute)
+		for i := 0; i < *relax_time; i++ {
+			fmt.Printf("continue relax %v minutes.\n", *relax_time - i)
+			time.Sleep(time.Minute)
+		}
 	}
 }
 
