@@ -1,4 +1,5 @@
 import Data.List
+import Data.Char
 
 main :: IO()
 main = do
@@ -76,3 +77,29 @@ ffib n = fastFib 0 1 n
 
 mmap _ [] = []
 mmap fn (x:xs) = (fn x):(mmap fn xs)
+
+ffilter _ [] = []
+ffilter fn (x:xs) = res ++ ffilter fn xs
+  where res = if fn x 
+              then [x]
+              else []
+
+rremove fn arr = ffilter notfn arr
+  where notfn = \value -> not (fn value)
+
+ffoldl _ i [] = i
+ffoldl fn init (x:xs) = ffoldl fn left xs
+  where left = init `fn` x
+
+ffoldr _ i [] = i
+ffoldr fn init (x:xs) = x `fn` right
+  where right = ffoldr fn init xs
+
+eelem _ [] = False
+eelem e arr = somePresent
+  where vals = filter (\el -> e == el) arr
+        somePresent = length vals > 0 
+
+isPalindrome sent = a == reverse a 
+  where a = (filter (\c -> not (c == ' ')) (map toLower sent))
+
