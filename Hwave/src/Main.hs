@@ -18,15 +18,13 @@ makeLetter r t s = toPart r ++
                    bodyPart t ++
                    fromPart s 
 
-manipuN n =
+collatz n =
   if a 
   then n - 2
   else 3 * n + 1
   where a = even n
 
 dd n = (\n -> n * 2) n * 2
-
-names = [("Loh", "Pidr"), ("Kek", "Lol"), ("Govno", "Jopa")]
 
 compLastNames a b = 
   compare n1 n2
@@ -75,3 +73,6 @@ fastFib n _ 0 = n
 fastFib n o c = fastFib o (n + o) (pred c)
 
 ffib n = fastFib 0 1 n
+
+mmap _ [] = []
+mmap fn (x:xs) = (fn x):(mmap fn xs)
