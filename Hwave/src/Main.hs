@@ -103,3 +103,8 @@ eelem e arr = somePresent
 isPalindrome sent = a == reverse a 
   where a = (filter (\c -> not (c == ' ')) (map toLower sent))
 
+halve :: Int -> Int
+halve n = n `div` 2
+
+printDouble :: Int -> String
+printDouble n = show (n * 2)
