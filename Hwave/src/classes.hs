@@ -21,9 +21,55 @@ rotateN n c = toEnum x
                  else 1 + fromEnum c + halfN 
         x      = offset `mod` n 
 
-data Alph = A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z deriving (Bounded, Enum, Show)
+encoder :: String -> String
+encoder sentense = map encode sentense 
+  where size = 1 + fromEnum (maxBound::Char)
+        encode = rotateN size
 
-alphabetEncoder :: [Alph] -> [Alph]
-alphabetEncoder letters = map encode letters
-  where alphSize = 1 + fromEnum (maxBound::Alph)
-        encode = rotateN alphSize
+decoder code = encoder code
+
+xxor :: Bool -> Bool -> Bool
+xxor a b = (a || b) && (not (a && b))
+
+xxorp :: (Bool, Bool) -> Bool
+xxorp (a, b) = xxor a b
+
+xxorl :: [Bool] -> [Bool] -> [Bool]
+xxorl a b = map xxorp (zip a b)
+
+type Bits = [Bool]
+
+intToBits' :: Int -> Bits
+intToBits' 0 = [False]
+intToBits' 1 = [True]
+intToBits' n = if (rem == 0) 
+              then False : intToBits' next
+              else True  : intToBits' next
+  where rem = n `mod` 2
+        next = n `div` 2
+
+maxBits :: Int
+maxBits = length (intToBits' maxBound)
+
+intToBits n = padding ++ reversed
+  where reversed = reverse (intToBits' n)
+        missing = maxBits - (length reversed)
+        padding = take missing (cycle [False])
+
+charToBits :: Char -> Bits
+charToBits c = intToBits (fromEnum c)
+
+bitsToInt :: Bits -> Int
+bitsToInt b = sum (map (\x -> 2^(snd x)) trues)
+  where size = length b
+        ind  = [size - 1, size - 2 .. 0]
+        trues = filter (\v -> fst v == True) (zip b ind)
+
+bitsToChar :: Bits -> Char
+bitsToChar bits = toEnum (bitsToInt bits)
+
+encodeStr :: String -> String
+encodeStr str = map encode str
+  where encode = (toEnum charToBits) 
+
+
