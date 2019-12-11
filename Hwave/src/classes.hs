@@ -68,8 +68,31 @@ bitsToInt b = sum (map (\x -> 2^(snd x)) trues)
 bitsToChar :: Bits -> Char
 bitsToChar bits = toEnum (bitsToInt bits)
 
-encodeStr :: String -> String
-encodeStr str = map encode str
-  where encode = (toEnum charToBits) 
+applyOtp :: String -> String -> [Bits]
+applyOtp pad plainText = map (\p -> (fst p) `xxorl` (snd p)) pairs
+  where bitsPad = map charToBits pad
+        bitsTxt = map charToBits plainText
+        pairs   = zip bitsPad bitsTxt
 
+encodeOtp :: String -> String -> String
+encodeOtp pad text = map bitsToChar bits
+  where bits = applyOtp pad text
 
+encoderDecoderOtp :: String -> String -> String
+encoderDecoderOtp pad = encodeOtp pad
+
+class Cipher a where
+  encode :: a -> String -> String
+  decode :: a -> String -> String
+
+data Rotate = Rotate
+
+instance Cipher Rotate where
+  encode Rotate txt = encoder txt
+  decode Rotate txt = decoder txt
+
+data Otp = Otp String 
+
+instance Cipher Otp where
+  encode (Otp pad) txt = encoderDecoderOtp pad txt
+  decode (Otp pad) txt = encoderDecoderOtp pad txt
