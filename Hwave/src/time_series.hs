@@ -72,6 +72,12 @@ mean xs = total / count
   where total = (realToFrac . sum) xs
         count = (realToFrac . length) xs
 
+meanMaybe :: (Real a) => [Maybe a] -> Maybe Double
+meanMaybe values = if any (== Nothing) values
+                   then Nothing
+                   else Just avg
+  where avg = (mean . (map fromJust)) values
+
 meanTimeSeries :: (Real a) => TimeSeries a -> Maybe Double
 meanTimeSeries (TimeSeries _ []) = Nothing
 meanTimeSeries (TimeSeries t v) = if all (== Nothing) v
@@ -83,11 +89,51 @@ meanTimeSeries (TimeSeries t v) = if all (== Nothing) v
 type CompareFn a = a -> a -> a
 type TimeSeriesCompareFn a = (Int, Maybe a) -> (Int, Maybe a) -> (Int, Maybe a)
 
-compareTimeSeries :: Eq a => CompareFn a -> TimeSeriesCompareFn a
-compareTimeSeries fn = fn'
+compareTimeSeriesFn :: Eq a => CompareFn a -> TimeSeriesCompareFn a
+compareTimeSeriesFn fn = fn'
   where fn' (i1, Nothing) (i2, Nothing) = (i1, Nothing)
         fn' (_, Nothing) (i, val) = (i, val)
         fn' (i, val) (_, Nothing) = (i, val)
         fn' (i1, Just val1) (i2, Just val2) = if fn val1 val2 == val1
                                               then (i1, Just val1)
                                               else (i2, Just val2)
+
+
+compTs :: Eq a => (a -> a -> a) -> TimeSeries a -> Maybe (Int, Maybe a)
+compTs fn (TimeSeries [] []) = Nothing
+compTs fn (TimeSeries times values) = if all (== Nothing) values
+                                      then Nothing
+                                      else Just value
+  where pairs = zip times values
+        value = foldl (compareTimeSeriesFn fn) (0, Nothing) pairs
+
+minTs :: Ord a => TimeSeries a -> Maybe (Int, Maybe a)
+minTs = compTs min
+maxTs :: Ord a => TimeSeries a -> Maybe (Int, Maybe a)
+maxTs = compTs max
+
+diffPair :: Num a => Maybe a -> Maybe a -> Maybe a
+diffPair _ Nothing = Nothing
+diffPair Nothing _ = Nothing
+diffPair (Just a) (Just b) = Just (a - b)
+
+diffTs :: Num a => TimeSeries a -> TimeSeries a
+diffTs (TimeSeries [] []) = TimeSeries [] []
+diffTs (TimeSeries times values) = TimeSeries times (Nothing:diffValues)
+  where shiftValues = tail values
+        diffValues  = zipWith diffPair shiftValues values
+
+movingAvg :: (Real a) => [Maybe a] -> Int -> [Maybe Double]
+movingAvg [] _ = []
+movingAvg values n = if length next == n
+                     then meanMaybe next:movingAvg rest n
+                     else []
+  where next = take n values
+        rest = tail values
+
+movingAvgTs :: (Real a) => TimeSeries a -> Int -> TimeSeries Double
+movingAvgTs (TimeSeries [] []) _ = TimeSeries [] []
+movingAvgTs (TimeSeries times v) n = TimeSeries times smooth
+  where moving = movingAvg v n
+        nothings = replicate (n `div` 2) Nothing
+        smooth = mconcat [nothings, moving, nothings]
