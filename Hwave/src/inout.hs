@@ -1,5 +1,7 @@
-import Data.Maybe
 import qualified Data.Map as Map
+import Data.Maybe
+import System.Environment
+import Control.Monad
 
 names :: Map.Map Int String
 names = Map.fromList [(0, "Kekus"), (1, "Loli")]
@@ -25,4 +27,13 @@ main = do
   putStrLn "Enter number: "
   n <- getLine
   let fib = ffib (read n)
-  putStrLn (show fib)
+  print fib
+
+getPutThreeFn :: IO ()
+getPutThreeFn = do
+  values <- mapM (\_ -> getLine) [1 .. 3]
+  mapM_ putStrLn values
+
+rreplicateM :: Monad m => Int -> m a -> m [a]
+rreplicateM n fn = mapM (\_ -> fn) [2..n]
+
