@@ -29,12 +29,28 @@ sortBytes bytes start len = mconcat [before, replaced, after]
         (range, after) = BC.splitAt len rest
         replaced       = BC.reverse (BC.sort range)
 
+-- todo rwr more generic
+
 randSortBytes :: BC.ByteString -> IO BC.ByteString
 randSortBytes bytes = do
   let len   =  BC.length bytes
   sortRange <- randomRIO (10, 110)
   location  <- randomRIO (0, len - sortRange)
   return (sortBytes bytes location sortRange)
+
+reverseBytes :: BC.ByteString -> Int -> Int -> BC.ByteString
+reverseBytes bytes start len = mconcat [before, replaced, after]
+  where (before, rest) = BC.splitAt start bytes
+        (range, after) = BC.splitAt len rest
+        replaced       = BC.reverse range
+
+
+randReverseBytes :: BC.ByteString -> IO BC.ByteString
+randReverseBytes bytes = do
+  let len   =  BC.length bytes
+  sortRange <- randomRIO (10, 110)
+  location  <- randomRIO (0, len - sortRange)
+  return (reverseBytes bytes location sortRange)
 
 applyEffects :: [BC.ByteString -> IO BC.ByteString] -> BC.ByteString -> IO BC.ByteString
 applyEffects effects image = do
@@ -55,36 +71,47 @@ main = do
     randSortBytes,
     randSortBytes,
     randReplaceByte,
+    randReverseBytes,
     randReplaceByte,
     randSortBytes,
-    randReplaceByte,
-    randReplaceByte,
-    randReplaceByte,
-    randSortBytes,
-    randReplaceByte,
-    randReplaceByte,
-    randSortBytes,
-    randSortBytes,
-    randSortBytes,
-    randReplaceByte,
-    randReplaceByte,
-    randSortBytes,
-    randSortBytes,
-    randSortBytes,
-    randSortBytes,
-    randSortBytes,
-    randSortBytes,
-    randReplaceByte,
+    randReverseBytes,
     randReplaceByte,
     randReplaceByte,
     randReplaceByte,
     randSortBytes,
+    randReplaceByte,
+    randReverseBytes,
+    randReplaceByte,
     randSortBytes,
     randSortBytes,
     randSortBytes,
+    randReplaceByte,
+    randReverseBytes,
+    randReplaceByte,
+    randSortBytes,
+    randSortBytes,
+    randReverseBytes,
     randSortBytes,
     randSortBytes,
     randSortBytes,
+    randReverseBytes,
+    randSortBytes,
+    randReplaceByte,
+    randReverseBytes,
+    randReplaceByte,
+    randReverseBytes,
+    randReplaceByte,
+    randReplaceByte,
+    randSortBytes,
+    randSortBytes,
+    randReverseBytes,
+    randSortBytes,
+    randSortBytes,
+    randSortBytes,
+    randReverseBytes,
+    randSortBytes,
+    randSortBytes,
+    randReverseBytes,
     randReplaceByte,
     randSortBytes])
 
