@@ -1,39 +1,42 @@
+-- Greedy algorithm knapsack problem
+
 import Data.List
-import Data.Semigroup 
 
 type Cost = Int
 type Weight = Int
 type Priority = Double
 
-data Item = Item Double Double Double deriving (Eq, Ord, Show)
+data Item = Item Cost Weight Priority deriving (Eq, Ord, Show)
 
-getWeight :: Item -> Double
+type Backpack = [Item]
+type Items    = [Item]
+
+getWeight :: Item -> Weight
 getWeight (Item _ w _) = w
 
-compItems (Item _ _ a) (Item _ _ b) 
-  | a < b = GT
-  | a > b = LT
-  | otherwise = EQ
+calcPriority :: Cost -> Weight -> Priority
+calcPriority c w = (fromIntegral c) / (fromIntegral w)
 
+newItem :: Cost -> Weight -> Item
+newItem c w = Item c w (calcPriority c w)
 
-costs :: [Double]
+compItems (Item _ _ a) (Item _ _ b) = compare a b
+
+costs :: [Cost]
 costs = [1, 2, 2, 4, 10]
 
-weights :: [Double]
+weights :: [Weight]
 weights = [1, 1, 2, 12, 4]
 
-items :: [Item]
-items = sortBy compItems (zipWith (\c w -> Item c w (c / w)) costs weights)
+items :: Items
+items = sortBy compItems (zipWith newItem costs weights)
 
-collect :: Double -> [Item] -> [Item] -> [Item]
+collect :: Int -> Backpack -> Items -> Backpack
 collect 0 bp _ = bp
 collect _ bp [] = bp
-collect limit backpack items = collect newLimit newBackpack rest
-  where next = head items 
-        rest = tail items
-        newBackpack = if getWeight next <= limit
-                      then backpack <> next
-                      else backpack
-        newLimit = if getWeight next <= limit
-                   then limit - getWeight next
-                   else 0
+collect limit backpack (next:rest) = collect newLimit newBackpack rest
+  where weight = getWeight next
+        (newBackpack, newLimit) = if weight <= limit
+                                  then (next:backpack, limit - weight)
+                                  else (backpack, 0)
+
