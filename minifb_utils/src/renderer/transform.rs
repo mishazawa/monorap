@@ -16,7 +16,7 @@ impl TransformMatrix {
     pub fn new() -> Self {
         TransformMatrix {
             rotation: 0.0,
-            rotation_sin_cos: (0., 1.),
+            rotation_sin_cos: (-1., 1.),
             translation: (0, 0),
             scale: 0.0,
         }
