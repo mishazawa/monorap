@@ -1,0 +1,1 @@
+unmanagedBase := baseDirectory.value / "lib"
